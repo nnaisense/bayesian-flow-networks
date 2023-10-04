@@ -1,0 +1,61 @@
+meta:
+  neptune:
+  debug: False
+data:
+  dataset: "text8"
+  seq_len: 256
+train_loader:
+  batch_size: 416
+  shuffle: True
+  num_workers: 8
+  pin_memory: True
+  drop_last: True
+val_loader:
+  batch_size: 200
+  shuffle: True
+  num_workers: 8
+  pin_memory: True
+model:
+  net:
+    class_name: "GPT"
+    parameters:
+      vocab_size: 27
+      n_layer: 24
+      n_head: 12
+      n_embd: 768
+      dropout: 0.0
+      skip: True
+      bias: True
+  input_adapter:
+    class_name: "TextInputAdapter"
+    parameters:
+      vocab_size: 27
+      seq_len: 256
+      output_size: 768
+      learn_pos_embedding: False
+  output_adapter: null
+  bayesian_flow:
+    class_name: "DiscreteBayesianFlow"
+    parameters:
+      n_classes: 27
+      max_sqrt_beta: 0.75
+  loss:
+    class_name: "DiscreteBayesianFlowLoss"
+    parameters: {}
+  distribution_factory:
+    class_name: "CategoricalFactory"
+    parameters: {}
+optimizer:
+  lr: 1e-4
+  betas: [0.9, 0.98]
+  weight_decay: 0.01
+training:
+  accumulate: 1
+  checkpoint_interval: 10_000
+  ema_decay: 0.9999
+  grad_clip_norm: 5
+  log_interval: 1
+  max_val_batches: 5_000
+  n_training_steps: 10_000_000
+  val_interval: 100_000
+  val_repeats: 1

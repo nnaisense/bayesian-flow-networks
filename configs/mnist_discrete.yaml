@@ -1,0 +1,70 @@
+meta:
+  neptune:
+  debug: False
+data:
+  dataset: "bin_mnist"
+train_loader:
+  batch_size: 512
+  shuffle: True
+  num_workers: 8
+  pin_memory: True
+  drop_last: True
+val_loader:
+  batch_size: 1000
+  shuffle: False
+  num_workers: 8
+  pin_memory: True
+model:
+  net:
+    class_name: "UNetModel"
+    parameters:
+      image_size: 28
+      in_channels: 2
+      model_channels: 128
+      out_channels: 128
+      num_res_blocks: 2
+      attention_resolutions: [8,16]
+      dropout: 0.5
+      channel_mult: [1, 2, 2]
+      conv_resample: True
+      dims: 2
+      num_heads: 4
+      num_heads_upsample: -1
+      project_input: True
+      skip: True
+  input_adapter:
+    class_name: "FourierImageInputAdapter"
+    parameters:
+      input_channels: 1
+      input_shape: [28, 28]
+      output_height: 2
+      add_pos_feats: False
+  output_adapter:
+    class_name: "OutputAdapter"
+    parameters:
+      input_height: 256
+      output_channels: 1
+      output_height: 1
+  bayesian_flow:
+    class_name: "DiscreteBayesianFlow"
+    parameters:
+      n_classes: 2
+      max_sqrt_beta: 3
+      discretize: False
+  loss:
+    class_name: "DiscreteBayesianFlowLoss"
+    parameters: {}
+  distribution_factory:
+    class_name: "BernoulliFactory"
+    parameters: {}
+optimizer:
+  lr: 1e-4
+  betas: [0.9,0.98]
+training:
+  checkpoint_interval: 10_000
+  ema_decay: 0.9999
+  grad_clip_norm: 5.0
+  log_interval: 1
+  n_training_steps: 1_000_000
+  val_interval: 50_000
+  val_repeats: 1000

@@ -1,0 +1,72 @@
+meta:
+  neptune: 
+  debug: False
+data:
+  dataset: "cifar10"
+  horizontal_flip: False
+  num_bins: 16
+train_loader:
+  batch_size: 32
+  shuffle: True
+  num_workers: 8
+  pin_memory: True
+  drop_last: True
+  persistent_workers: True
+val_loader:
+  batch_size: 1000
+  shuffle: False
+  num_workers: 8
+  pin_memory: True
+model:
+  net:
+    class_name: "UNetVDM"
+    parameters:
+      embedding_dim: 128
+      n_blocks: 32
+      n_attention_heads: 1
+      dropout_prob: 0.1
+      norm_groups: 32
+      input_channels: 3
+      use_fourier_features: True
+      attention_everywhere: False
+      image_size: 32
+  input_adapter:
+    class_name: "FourierImageInputAdapter"
+    parameters:
+      input_channels: 3
+      input_shape: [32, 32]
+      output_height: 3
+      add_pos_feats: False
+      add_mask: False
+  output_adapter:
+    class_name: "OutputAdapter"
+    parameters:
+      input_height: 131
+      output_channels: 3 # (r,g,b)
+      output_height: 2 # mean, std
+  bayesian_flow:
+    class_name: "CtsBayesianFlow"
+    parameters:
+      min_variance: 1e-3
+  loss:
+    class_name: "CtsBayesianFlowLoss"
+    parameters:
+      noise_pred: True
+  distribution_factory:
+    class_name: "DiscretizedNormalFactory"
+    parameters:
+      num_bins: 16
+      clip: True
+optimizer:
+  lr: 2e-4
+  betas: [0.9,0.99]
+  weight_decay: 0.01
+  eps: 1e-8
+training:
+  checkpoint_interval: 10_000
+  ema_decay: 0.9999
+  grad_clip_norm: 5.0
+  log_interval: 1
+  n_training_steps: 1_000_000
+  val_interval: 50_000
+  val_repeats: 100
