@@ -32,9 +32,9 @@ The models in the paper can be trained using the configs provided in the `config
 
 ```shell
 # mnist experiment on 1 GPU
-accelerate launch train.py config_file=configs/mnist_discrete.yaml
+accelerate launch --num_processes=1 train.py config_file=configs/mnist_discrete.yaml
 # cifar10 experiment on 1 GPU (A100)
-accelerate launch train.py config_file=configs/cifar10_discretized_256bins.yaml
+accelerate launch --num_processes=1 train.py config_file=configs/cifar10_discretized_256bins.yaml
 # text8 experiment on 8 GPUs (A100)
 accelerate launch --multi_gpu --num_processes=8 --num_machines=1 --dynamo_backend=no --mixed_precision=fp16 train.py config_file=configs/text8_discrete.yaml 
 ```
