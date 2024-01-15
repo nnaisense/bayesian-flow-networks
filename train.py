@@ -158,7 +158,7 @@ def train(
             log(run["metrics"]["epoch"], step // len(dataloaders["train"]), step, is_main)
 
             if is_main and (step % cfg.val_interval == 0) and "val" in dataloaders:
-                best_val_loss = validate(
+                val_loss = validate(
                     cfg=cfg,
                     model=model,
                     ema_model=ema_model,
@@ -170,6 +170,7 @@ def train(
                     checkpoint_root_dir=checkpoint_root_dir,
                     accelerator=accelerator,
                 )
+                best_val_loss = min(val_loss, best_val_loss)
 
             pbar.update(train_id, advance=1, loss=loss.item())
 
