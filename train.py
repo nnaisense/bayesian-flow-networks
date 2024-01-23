@@ -178,7 +178,7 @@ def train(
 def main(cfg):
     acc = Accelerator(gradient_accumulation_steps=cfg.training.accumulate)
 
-    cfg.training.seed = seed_everything(cfg.training.seed)
+    seed_everything(cfg.training.seed)
     logger.info(f"Seeded everything with seed {cfg.training.seed}", main_process_only=True)
 
     with acc.main_process_first():

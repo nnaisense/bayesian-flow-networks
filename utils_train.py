@@ -46,15 +46,13 @@ from networks import adapters
 logger = get_logger(__name__)
 
 
-def seed_everything(seed: Optional[int]) -> int:
-    if seed is None:
-        seed = random.randrange(np.iinfo(np.int32).max)
+def seed_everything(seed: Optional[int]):
+    assert seed is not None
+    seed += torch.distributed.get_rank() if torch.distributed.is_initialized() else 0
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-
-    return seed
 
 
 def worker_init_function(worker_id: int) -> None:
@@ -62,12 +60,6 @@ def worker_init_function(worker_id: int) -> None:
     worker_seed = torch.initial_seed() % 2**32
     np.random.seed(worker_seed)
     random.seed(worker_seed)
-
-
-def get_generator(seed: int):
-    g = torch.Generator()
-    g.manual_seed(seed)
-    return g
 
 
 def init_checkpointing(checkpoint_dir: Union[str, Path, None], run_id: str) -> Optional[Path]:
@@ -143,13 +135,11 @@ def make_dataloaders(cfg: DictConfig):
         "train": DataLoader(
             dataset=train_set,
             worker_init_fn=worker_init_function,
-            generator=get_generator(cfg.training.seed),
             **cfg.train_loader,
         ),
         "val": DataLoader(
             dataset=val_set,
             worker_init_fn=worker_init_function,
-            generator=get_generator(cfg.training.seed),
             **cfg.val_loader,
         ),
     }
@@ -205,7 +195,7 @@ default_train_config = {
         "grad_clip_norm": -1,
         "log_interval": 50,
         "max_val_batches": -1,
-        "seed": None,
+        "seed": 666,
         "start_step": 1,
         "val_repeats": 1,
     },
