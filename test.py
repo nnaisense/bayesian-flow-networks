@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import math
-from typing import Optional, Tuple
+from typing import Tuple
 
 import torch
 from omegaconf import OmegaConf, DictConfig
@@ -23,18 +23,17 @@ from torch.utils.data import DataLoader
 
 from data import make_datasets
 from model import BFN
-from utils_train import seed_everything, make_config, make_bfn, worker_init_function, get_generator, make_progress_bar
+from utils_train import seed_everything, make_config, make_bfn, worker_init_function, make_progress_bar
 
 torch.set_float32_matmul_precision("high")
 torch.backends.cudnn.benchmark = True
 
 
-def setup(seed, cfg: DictConfig) -> Tuple[nn.Module, DataLoader]:
+def setup(cfg: DictConfig) -> Tuple[nn.Module, DataLoader]:
     test_ds = make_datasets(cfg.data)[-1]
     test_dl = DataLoader(
         dataset=test_ds,
         worker_init_fn=worker_init_function,
-        generator=get_generator(seed),
         batch_size=100,
         shuffle=False,
         num_workers=8,
@@ -85,7 +84,7 @@ def main(cfg: DictConfig) -> tuple[float, float, float, float]:
 
     # Get model and data config from the training config file
     train_cfg = make_config(cfg.config_file)
-    model, dataloader = setup(cfg.seed, train_cfg)
+    model, dataloader = setup(train_cfg)
 
     model.load_state_dict(torch.load(cfg.load_model, weights_only=True, map_location="cpu"))
     loss_mean, loss_err, recon_mean, recon_err = test(model, dataloader, cfg.n_steps, cfg.n_repeats)
