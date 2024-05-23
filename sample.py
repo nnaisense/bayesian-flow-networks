@@ -29,8 +29,8 @@ def main(cfg: DictConfig) -> torch.Tensor:
         load_model (str): Path to a saved checkpoint to be tested
         sample_shape (list): Shape of sample batch, e.g.:
             (3, 256) for sampling 3 sequences of length 256 from the text8 model.
-            (2, 3, 32, 32) for sampling 2 images from the CIFAR10 model.
-            (4, 1, 28, 28) for sampling 4 images from the MNIST model.
+            (2, 32, 32, 3) for sampling 2 images from the CIFAR10 model.
+            (4, 28, 28, 1) for sampling 4 images from the MNIST model.
         n_steps (int): Number of sampling steps (positive integer).
         save_file (str): File path to save the generated sample tensor. Skip saving if None.
     """

@@ -254,9 +254,11 @@ class DeltaDistribution(CtsDistribution):
             mean = mean.clip(min=-clip_range, max=clip_range)
         self.mean = mean
 
+    @functools.cached_property
     def mode(self):
         return self.mean
 
+    @functools.cached_property
     def mean(self):
         return self.mean
 

@@ -430,7 +430,7 @@ class BFN(nn.Module):
         input_params = self.bayesian_flow.get_prior_input_params(data_shape, device)
         distribution_factory = self.loss.distribution_factory
 
-        for i in range(1, n_steps):
+        for i in range(1, n_steps + 1):
             t = torch.ones(*data_shape, device=device) * (i - 1) / n_steps
             output_params = self.net(self.bayesian_flow.params_to_net_inputs(input_params), t)
             output_sample = distribution_factory.get_dist(output_params, input_params, t).sample()
